@@ -1,0 +1,130 @@
+body{
+    background-color: gainsboro;
+}
+#myCanvas {
+    background-color: white;
+    color: black;
+    border: 1px solid red;
+    width: 80vw;
+    height: 80vh;
+    margin: auto;
+}
+#pickAClass{
+    text-align: center;
+    font-size: 3vw;
+}
+#selectionMenu{
+    background-color: white;
+    border: 1px solid black;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+}
+#mainScene {
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    margin: auto;
+}
+#middle{
+    height: 44%;
+    background-color: #4D99B2;
+}
+#hud {
+    color: black;
+    height: 12%;
+}
+#bottom {
+    background-color: #98f325;
+    height: 44%;
+}
+#leftSelect {
+    float: left;
+    background-color: white;
+    height: 80%;
+    width: 20%;
+    margin-top: 2%;
+    margin-left: 2%;
+}
+#rightSelect {
+    float: right;
+    background-color: white;
+    height: 80%;
+    width: 20%;
+    margin-top: 2%;
+    margin-right: 2%;
+}
+#player {
+    float:left;
+    height: 100%;
+    width: 7%;
+    margin-left: 8%;
+}
+#computer {
+    float:right;
+    height: 100%;
+    width: 7%;
+    margin-right: 8%;
+}
+#leftTop {
+    float: left;
+    height: 100%;
+    width: 50%;
+}
+#rightTop {
+    text-align: right;
+    float: right;
+    height: 100%;
+    width: 50%;
+}
+#next {
+    width: 13%;
+    height: 20%;
+    width:13%;margin:0 auto;
+    background-color: black;
+    color: white;
+    font-size: 40px;
+    text-align: center;
+}
+.option{
+    width: 33.33%;
+    height: 100%;
+    box-sizing: content-box;
+    background-color:coral;
+    margin: 0%;
+    padding: 0%;
+    float:left;  
+}
+.showSword {
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    background-color: red;
+    margin: 0%;
+    padding: 0%;
+}
+.showBow {
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    background-color: green;
+    margin: 0%;
+    padding: 0%;
+}
+.showShield {
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    background-color: blue;
+    margin: 0%;
+    padding: 0%;
+}
+#sword:hover{
+    background-color: red;
+}
+#bow:hover{
+    background-color: green;
+}
+#shield:hover{
+    background-color: blue;
+}
