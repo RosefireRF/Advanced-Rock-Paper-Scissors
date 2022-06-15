@@ -58,6 +58,12 @@
           item.textContent = content;
           messages.append(item);
         })
+        socket.on('moveMade', function(values){
+          var item = document.createElement('li');
+          let content = "You both made a move!";
+          item.textContent = content;
+          messages.append(item);
+        })
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
           if(usernameInput.value){

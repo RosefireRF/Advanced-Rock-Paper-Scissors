@@ -40,7 +40,9 @@ io.on('connection', (socket) => {
       if(listOfUsers.length >= 2){
       	//Create new room with two users
       	Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username);
+        listOfPlayers.push(Player1);
       	Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username);
+        listOfPlayers.push(Player2);
       	listOfUsers.splice(0, 2);
       	console.log("New room created!");
       	console.log(listOfUsers);
@@ -53,6 +55,25 @@ io.on('connection', (socket) => {
       	console.log(listOfRooms);
       }
     });
+    socket.on('moveSelected', (move) =>{
+      console.log("User with ID of " + socket.id + " made move " + move);
+      console.log(listOfPlayers);
+      var Player = listOfPlayers.find(element => element.id == socket.id);
+      var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
+      let movesMade = true;
+      Player.move = move;
+      console.log(Player.username + "'s move is " + Player.move);
+      for (var P of Room.players){
+        if(typeof P.move == 'undefined')movesMade = false;
+      }
+      if (movesMade == true){
+      for (var P of currentRoom.players){
+          sid = P.id
+          io.to(sid).emit('moveMade', 'haha');
+          Player.move = false;
+        }
+      }
+    })
   });
 
 http.listen(3000, () => {
