@@ -28,6 +28,12 @@
 <body>
     <form action="" id="username">
       <input id="usernameInput" type="text">
+      <select name="classes" id="classes">
+        <option disabled selected value='unselected'>Select a class</option>
+        <option value="rock">Rock</option>
+        <option value="paper">Paper</option>
+        <option value="scissors">Scissors</option>
+      </select>
       <button type="submit">Set Username</button>
     </form>
     <ul id="messages"></ul>
@@ -42,6 +48,7 @@
         var input = document.getElementById('input');
         var usernameForm = document.getElementById('username');
         var usernameInput = document.getElementById('usernameInput');
+        var classInput = document.getElementById('classes');
         socket.on('joinEvent', function(username){
           var item = document.createElement('li');
           let content = username + " joined the game";
@@ -58,16 +65,22 @@
           item.textContent = content;
           messages.append(item);
         })
-        socket.on('moveMade', function(values){
+        socket.on('moveMade', values =>{
           var item = document.createElement('li');
-          let content = "You both made a move!";
+          let content;
+          if(values.type == 1){
+                content = "You both made the same move!";
+          }
+          else{
+              content = "You selected different moves!";
+          }
           item.textContent = content;
           messages.append(item);
         })
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
           if(usernameInput.value){
-            socket.emit('setUsername', usernameInput.value);
+            socket.emit('setUsername', {name: usernameInput.value, class : classInput.value });
             console.log(usernameInput.value + "ime");
             usernameForm.remove();
             usernameInput.value = '';
@@ -77,6 +90,10 @@
           e.preventDefault();
           if (input.value) {
             socket.emit('moveSelected', input.value);
+            var item = document.createElement('li');
+            let content = "You selected: " + input.value;
+            item.textContent = content;
+            messages.append(item);
             input.value = '';
           }
         });

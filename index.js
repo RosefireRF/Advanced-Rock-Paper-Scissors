@@ -11,18 +11,19 @@ listOfUsers = [];
 listOfPlayers = [];
 listOfRooms = [];
 class User {
-  constructor(id, username){
+  constructor(id, username, pref){
     this.id = id;
     this.username = username;
+    this.pref = pref;
   }
 }
 class Player{
-	constructor(id, username){
+	constructor(id, username, pref){
 		this.id = id;
 		this.username = username
 		this.health = 100;
     this.move;
-    this.pref;
+    this.pref = pref;
 	}
 }
 class Room{
@@ -33,15 +34,15 @@ class Room{
 }
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.on('setUsername', (username) =>{
-      listOfUsers.push(new User(socket.id, username));
-      io.emit('joinEvent', username)
+    socket.on('setUsername', data =>{
+      listOfUsers.push(new User(socket.id, data.name, data.class));
+      io.emit('joinEvent', data.name)
       console.log(listOfUsers)
       if(listOfUsers.length >= 2){
       	//Create new room with two users
-      	Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username);
+      	Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref);
         listOfPlayers.push(Player1);
-      	Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username);
+      	Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref);
         listOfPlayers.push(Player2);
       	listOfUsers.splice(0, 2);
       	console.log("New room created!");
@@ -57,21 +58,30 @@ io.on('connection', (socket) => {
     });
     socket.on('moveSelected', (move) =>{
       console.log("User with ID of " + socket.id + " made move " + move);
-      console.log(listOfPlayers);
       var Player = listOfPlayers.find(element => element.id == socket.id);
       var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
       let movesMade = true;
       Player.move = move;
+      console.log(listOfPlayers);
       console.log(Player.username + "'s move is " + Player.move);
       for (var P of Room.players){
         if(typeof P.move == 'undefined')movesMade = false;
       }
       if (movesMade == true){
-      for (var P of currentRoom.players){
-          sid = P.id
-          io.to(sid).emit('moveMade', 'haha');
-          Player.move = false;
-        }
+      if(Room.players[0].move == Room.players[1].move){
+        for (var P of currentRoom.players){
+            sid = P.id
+            io.to(sid).emit('moveMade', {type: 1});
+            P.move = undefined;
+          }
+      }
+      else{
+        for (var P of currentRoom.players){
+            sid = P.id
+            io.to(sid).emit('moveMade', {type: 0});
+            P.move = undefined;
+          }
+      }
       }
     })
   });
