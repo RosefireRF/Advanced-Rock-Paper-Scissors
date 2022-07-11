@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
       }
     });
     socket.on('moveSelected', (move) =>{
+      //Find player that made move and room where it was made
       console.log("User with ID of " + socket.id + " made move " + move);
       var Player = listOfPlayers.find(element => element.id == socket.id);
       var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
@@ -64,9 +65,11 @@ io.on('connection', (socket) => {
       Player.move = move;
       console.log(listOfPlayers);
       console.log(Player.username + "'s move is " + Player.move);
+      //If either of the players hasn't made a move, the variable is false
       for (var P of Room.players){
         if(typeof P.move == 'undefined')movesMade = false;
       }
+      //If both players chose the same move
       if (movesMade == true){
       if(Room.players[0].move == Room.players[1].move){
         for (var P of currentRoom.players){
