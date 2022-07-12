@@ -52,16 +52,14 @@ function calculateDamage(players){
   damage = 10;
   winner = checkContestWinner(players);
   if(players[winner].pref === players[winner].move) damage *= 2;
-  if(winner === 0){
-    players[1 - winner].health -= damage;
-    console.log(players);
-    return(`${players[0].username} did ${damage} damage to ${players[1].username}, they now have ${players[1].health} hp`);
-  }
-  else{
-    players[0].health -= damage;
-    console.log(players);
-    return(`${players[1].username} did ${damage} damage to ${players[0].username}, they now have ${players[0].health} hp`);
-  }
+  //Winner did X damage to player opposite of winner
+  /*
+  If player[1] is the winner, deal damage to player[1 - 1] (player[0])
+  if player[0] is the winner, deal damage to player[1 - 0] (player[1])
+  */
+  players[1 - winner].health -= damage;
+  console.log(players);
+  return(`${players[winner].username} did ${damage} damage to ${players[1-winner].username}, they now have ${players[1-winner].health} hp`);
 }
 io.on('connection', (socket) => {
     console.log('a user connected');
