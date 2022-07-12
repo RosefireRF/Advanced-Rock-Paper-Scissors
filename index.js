@@ -30,6 +30,7 @@ class Room{
 	constructor(Player1, Player2){
 		this.players = [Player1, Player2];
 		this.name = Player1.username + ` (${Player1.pref}) vs ` + Player2.username + ` (${Player2.pref})`;
+    this.finished = 0;
 	}
 }
 //Determine which player won the contested throw
@@ -48,7 +49,8 @@ function checkContestWinner(players){
   }
 }
 //Return text to be printed out to players
-function calculateDamage(players){
+function calculateDamage(Room){
+  players = Room.players;
   damage = 10;
   winner = checkContestWinner(players);
   if(players[winner].pref === players[winner].move) damage *= 2;
@@ -58,8 +60,30 @@ function calculateDamage(players){
   if player[0] is the winner, deal damage to player[1 - 0] (player[1])
   */
   players[1 - winner].health -= damage;
+  if(players[1-winner].health <= 0)
+  {
+    Room.finished = 1;
+    return(`${players[winner].username} dealt the killing blow to ${players[1 - winner].username} winning the game`);
+  }
   console.log(players);
   return(`${players[winner].username} did ${damage} damage to ${players[1-winner].username}, they now have ${players[1-winner].health} hp`);
+}
+function roomCreation(){
+  if(listOfUsers.length < 2) return false;
+  Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref);
+  listOfPlayers.push(Player1);
+  Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref);
+  listOfPlayers.push(Player2);
+  listOfUsers.splice(0, 2);
+  console.log("New room created!");
+  console.log(listOfUsers);
+  currentRoom = new Room(Player1, Player2)
+  listOfRooms.push(currentRoom);
+  for (var P of currentRoom.players){
+    sid = P.id
+    io.to(sid).emit('roomJoined', currentRoom.name);
+  }
+  console.log(listOfRooms);
 }
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -67,23 +91,7 @@ io.on('connection', (socket) => {
       listOfUsers.push(new User(socket.id, data.name, data.class));
       io.emit('joinEvent', data.name)
       console.log(listOfUsers)
-      if(listOfUsers.length >= 2){
-      	//Create new room with two users
-      	Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref);
-        listOfPlayers.push(Player1);
-      	Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref);
-        listOfPlayers.push(Player2);
-      	listOfUsers.splice(0, 2);
-      	console.log("New room created!");
-      	console.log(listOfUsers);
-      	currentRoom = new Room(Player1, Player2)
-      	listOfRooms.push(currentRoom);
-        for (var P of currentRoom.players){
-          sid = P.id
-          io.to(sid).emit('roomJoined', currentRoom.name);
-        }
-      	console.log(listOfRooms);
-      }
+      roomCreation();
     });
     socket.on('moveSelected', (move) =>{
       //Find player that made move and room where it was made
@@ -101,20 +109,30 @@ io.on('connection', (socket) => {
       //If both players chose the same move
       if (movesMade == true){
       if(Room.players[0].move === Room.players[1].move){
+        Room.players[0].move = undefined;
+        Room.players[1].move = undefined;
         for (var P of currentRoom.players){
             sid = P.id
             io.to(sid).emit('moveMade', {type: 1});
-            P.move = undefined;
           }
       }
       else{
-        text = calculateDamage(Room.players);
+        text = calculateDamage(Room);
         Room.players[0].move = undefined;
         Room.players[1].move = undefined;
         for (var P of currentRoom.players){
             sid = P.id
             io.to(sid).emit('moveMade', {type: 0, text: text});
           }
+        //Process the game ending, send both players to queue;
+        if(Room.finished === 1){
+          for (var P of Room.players){
+            listOfPlayers = listOfPlayers.filter(player => player.username != P.username);
+            listOfUsers.push(new User(P.id, P.username, P.pref));
+            listOfRooms = listOfRooms.filter(room => room.name != Room.name);
+            roomCreation();
+          }
+        }
       }
       }
     })
