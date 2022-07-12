@@ -63,7 +63,7 @@ function calculateDamage(Room){
   if(players[1-winner].health <= 0)
   {
     Room.finished = 1;
-    return(`${players[winner].username} dealt the killing blow to ${players[1 - winner].username} winning the game`);
+    return(`${players[winner].username} dealt the killing blow to ${players[1 - winner].username}, winning the game`);
   }
   console.log(players);
   return(`${players[winner].username} did ${damage} damage to ${players[1-winner].username}, they now have ${players[1-winner].health} hp`);
@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('setUsername', data =>{
       listOfUsers.push(new User(socket.id, data.name, data.class));
-      io.emit('joinEvent', data.name)
+      io.to(socket.id).emit('joinEvent', data.name)
       console.log(listOfUsers)
       roomCreation();
     });
@@ -126,12 +126,12 @@ io.on('connection', (socket) => {
           }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
+          listOfPlayers = listOfPlayers.filter(player => player.username != Room.players[0].username && player.username != Room.players[1].username);
           for (var P of Room.players){
-            listOfPlayers = listOfPlayers.filter(player => player.username != P.username);
             listOfUsers.push(new User(P.id, P.username, P.pref));
-            listOfRooms = listOfRooms.filter(room => room.name != Room.name);
-            roomCreation();
           }
+          listOfRooms = listOfRooms.filter(room => room.name != Room.name);
+          roomCreation();
         }
       }
       }
