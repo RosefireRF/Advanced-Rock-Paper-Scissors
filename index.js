@@ -29,8 +29,39 @@ class Player{
 class Room{
 	constructor(Player1, Player2){
 		this.players = [Player1, Player2];
-		this.name = Player1.username + " vs " + Player2.username;
+		this.name = Player1.username + ` (${Player1.pref}) vs ` + Player2.username + ` (${Player2.pref})`;
 	}
+}
+//Determine which player won the contested throw
+function checkContestWinner(players){
+  if(players[0].move === 'R'){
+    if(players[1].move === 'S') return(0);
+    if(players[1].move === 'P') return(1);
+  }
+  if(players[0].move === 'P'){
+    if(players[1].move === 'R') return(0);
+    if(players[1].move === 'S') return(1);
+  }
+  if(players[0].move === 'S'){
+    if(players[1].move === 'P') return(0);
+    if(players[1].move === 'R') return(1);
+  }
+}
+//Return text to be printed out to players
+function calculateDamage(players){
+  damage = 10;
+  winner = checkContestWinner(players);
+  if(players[winner].pref === players[winner].move) damage *= 2;
+  if(winner === 0){
+    players[1 - winner].health -= damage;
+    console.log(players);
+    return(`${players[0].username} did ${damage} damage to ${players[1].username}, they now have ${players[1].health} hp`);
+  }
+  else{
+    players[0].health -= damage;
+    console.log(players);
+    return(`${players[1].username} did ${damage} damage to ${players[0].username}, they now have ${players[0].health} hp`);
+  }
 }
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -71,7 +102,7 @@ io.on('connection', (socket) => {
       }
       //If both players chose the same move
       if (movesMade == true){
-      if(Room.players[0].move == Room.players[1].move){
+      if(Room.players[0].move === Room.players[1].move){
         for (var P of currentRoom.players){
             sid = P.id
             io.to(sid).emit('moveMade', {type: 1});
@@ -79,10 +110,12 @@ io.on('connection', (socket) => {
           }
       }
       else{
+        text = calculateDamage(Room.players);
+        Room.players[0].move = undefined;
+        Room.players[1].move = undefined;
         for (var P of currentRoom.players){
             sid = P.id
-            io.to(sid).emit('moveMade', {type: 0});
-            P.move = undefined;
+            io.to(sid).emit('moveMade', {type: 0, text: text});
           }
       }
       }

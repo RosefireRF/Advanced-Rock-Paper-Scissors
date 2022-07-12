@@ -30,9 +30,9 @@
       <input id="usernameInput" type="text">
       <select name="classes" id="classes">
         <option disabled selected value='unselected'>Select a class</option>
-        <option value="rock">Rock</option>
-        <option value="paper">Paper</option>
-        <option value="scissors">Scissors</option>
+        <option value="R">Rock</option>
+        <option value="P">Paper</option>
+        <option value="S">Scissors</option>
       </select>
       <button type="submit">Set Username</button>
     </form>
@@ -68,11 +68,11 @@
         socket.on('moveMade', values =>{
           var item = document.createElement('li');
           let content;
-          if(values.type == 1){
+          if(values.type === 1){
                 content = "You both made the same move!";
           }
           else{
-              content = "You selected different moves!";
+              content = values.text;
           }
           item.textContent = content;
           messages.append(item);
