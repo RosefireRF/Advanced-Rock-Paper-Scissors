@@ -50,7 +50,20 @@
     </div>
     <ul id="messages"></ul>
     <form id="form" action="">
-      <input id="input" autocomplete="off" /><button type="submit">Send</button>
+      <div class="flex" style="display: flex; width: 100%; justify-content: space-between;">
+        <div class="flex selectOption flex-column">
+          <label for="rock">Rock</label>
+          <input type="radio" name="class" id="rock" value="R">
+        </div>
+        <div class="flex selectOption flex-column">
+          <label for="paper">Paper</label>
+          <input type="radio" name="class" id="paper" value="P">
+        </div>
+        <div class="flex selectOption flex-column">
+          <label for="scissors">Scissors</label>
+          <input type="radio" name="class" id="scissors" value="S">
+        </div>
+      <button type="submit" id="sendMove">Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
@@ -62,6 +75,7 @@
         var usernameForm = document.getElementById('charCreation');
         var usernameInput = document.getElementById('usernameInput');
         var classInput = document.getElementById('classes');
+        var selectButton = document.getElementById('sendMove');
         socket.on('joinEvent', function(username){
           var item = document.createElement('li');
           let content = username + " joined the game";
@@ -89,6 +103,7 @@
           }
           item.textContent = content;
           messages.append(item);
+          selectButton.disabled = false;
         })
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
@@ -102,13 +117,15 @@
         })
     	 form.addEventListener('submit', function(e) {
           e.preventDefault();
-          if (input.value) {
-            socket.emit('moveSelected', input.value);
+          input = document.querySelector('input[name="class"]:checked').value;
+          if (input) {
+            socket.emit('moveSelected', input);
+            selectButton.disabled = true;
             var item = document.createElement('li');
-            let content = "You selected: " + input.value;
+            let content = "You selected: " + input;
             item.textContent = content;
             messages.append(item);
-            input.value = '';
+
           }
         });
     </script>
