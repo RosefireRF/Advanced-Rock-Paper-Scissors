@@ -23,18 +23,25 @@
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
 	</style>
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 <body>
-    <form action="" id="username">
-      <input id="usernameInput" type="text">
-      <select name="classes" id="classes">
-        <option disabled selected value='unselected'>Select a class</option>
-        <option value="R">Rock</option>
-        <option value="P">Paper</option>
-        <option value="S">Scissors</option>
-      </select>
-      <button type="submit">Set Username</button>
-    </form>
+    <div id="login" class="flex flex-column">
+      <h2>Select your username and class!</h2>
+      <form action="" id="charCreation" class="flex flex-column">
+        <label for="usernameInput">Username</label>
+        <input id="usernameInput" type="text">
+        <div style="display: flex;">
+          <label for="rock">Rock</label>
+          <input type="radio" name="class" id="rock" value="R">
+          <label for="paper">Paper</label>
+          <input type="radio" name="class" id="paper" value="P">
+          <label for="scissors">Scissors</label>
+          <input type="radio" name="class" id="scissors" value="S">
+        </div>
+        <button type="submit">Set Username</button>
+      </form>
+    </div>
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button type="submit">Send</button>
@@ -42,10 +49,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
     	var socket = io();
+        var loginScreen = document.getElementById('login')
         var messages = document.getElementById('messages');
         var form = document.getElementById('form');
         var input = document.getElementById('input');
-        var usernameForm = document.getElementById('username');
+        var usernameForm = document.getElementById('charCreation');
         var usernameInput = document.getElementById('usernameInput');
         var classInput = document.getElementById('classes');
         socket.on('joinEvent', function(username){
@@ -78,10 +86,11 @@
         })
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
+          selectedClass = document.querySelector('input[name="class"]:checked').value;
           if(usernameInput.value){
-            socket.emit('setUsername', {name: usernameInput.value, class : classInput.value });
+            socket.emit('setUsername', {name: usernameInput.value, class : selectedClass});
             console.log(usernameInput.value + "ime");
-            usernameForm.remove();
+            loginScreen.remove();
             usernameInput.value = '';
           }
         })
