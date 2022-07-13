@@ -27,19 +27,25 @@
 </head>
 <body>
     <div id="login" class="flex flex-column">
-      <h2>Select your username and class!</h2>
-      <form action="" id="charCreation" class="flex flex-column">
+      <form action="" id="charCreation" style="text-align: center;" class="flex flex-column">
+        <h2>Select your username and class!</h2>
         <label for="usernameInput">Username</label>
         <input id="usernameInput" type="text">
-        <div style="display: flex;">
-          <label for="rock">Rock</label>
-          <input type="radio" name="class" id="rock" value="R">
-          <label for="paper">Paper</label>
-          <input type="radio" name="class" id="paper" value="P">
-          <label for="scissors">Scissors</label>
-          <input type="radio" name="class" id="scissors" value="S">
+        <div class="flex" style="display: flex; width: 100%; justify-content: space-between;">
+          <div class="flex selectOption flex-column">
+            <label for="rock">Rock</label>
+            <input type="radio" name="class" id="rock" value="R">
+          </div>
+          <div class="flex selectOption flex-column">
+            <label for="paper">Paper</label>
+            <input type="radio" name="class" id="paper" value="P">
+          </div>
+          <div class="flex selectOption flex-column">
+            <label for="scissors">Scissors</label>
+            <input type="radio" name="class" id="scissors" value="S">
+          </div>
         </div>
-        <button type="submit">Set Username</button>
+        <button class="btn" type="submit">Join game!</button>
       </form>
     </div>
     <ul id="messages"></ul>
@@ -87,7 +93,7 @@
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
           selectedClass = document.querySelector('input[name="class"]:checked').value;
-          if(usernameInput.value){
+          if(usernameInput.value && selectedClass){
             socket.emit('setUsername', {name: usernameInput.value, class : selectedClass});
             console.log(usernameInput.value + "ime");
             loginScreen.remove();

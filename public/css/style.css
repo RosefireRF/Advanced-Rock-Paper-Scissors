@@ -18,9 +18,21 @@
     flex-direction: column;
 }
 #charCreation{
-    width: 30%;
+    width: 90%;
     height: 50%;
 }
 #charCreation input{
     width: 100%;
+}
+.selectOption{
+    width: 100% / 3;
+}
+.btn{
+    width: 50%;
+    height: 10%;
+}
+@media only screen and (min-width: 1000px) {
+    #charCreation{
+        width: 30%;
+    }
 }
