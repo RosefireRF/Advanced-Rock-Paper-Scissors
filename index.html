@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
+	<title>Advanced Rock Paper Scissors</title>
 	<style type="text/css">
 		      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
@@ -23,7 +23,6 @@
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
 	</style>
-    <script src="https://cdn.socket.io/3.1.1/socket.io.min.js"></script>
 </head>
 <body>
     <form action="" id="username">
@@ -40,7 +39,7 @@
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button type="submit">Send</button>
     </form>
-</body>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
     	var socket = io();
         var messages = document.getElementById('messages');
@@ -98,4 +97,5 @@
           }
         });
     </script>
+</body>
 </html>
