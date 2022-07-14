@@ -31,8 +31,63 @@
     width: 50%;
     height: 10%;
 }
+.typeSelector{
+    margin: 0% auto;
+}
+.typeSelector input{
+    margin:0;padding:0;
+    -webkit-appearance:none;
+       -moz-appearance:none;
+            appearance:none;
+}
+.classCover{
+    cursor:pointer;
+    background-size:contain;
+    background-repeat:no-repeat;
+    display:inline-block;
+    width:100px;height:100px;
+    border-radius: 10%;
+}
+.spaceAround{
+    justify-content: space-around;
+}
+.rock{
+    background-image:url("../images/sword.png");
+}
+.paper{
+    background-image: url("../images/shield.png");
+}
+.scissors{
+    background-image: url("../images/bow.png");
+}
+.selectRock input:checked ~.rock{
+    background-color: red;
+    border: 1px solid red;
+}
+.selectPaper input:checked ~.paper{
+    background-color: blue;
+}
+.selectScissors input:checked ~.scissors{
+    background-color: green;
+}
+.rock:hover{
+    background-color: red;
+}
+.paper:hover{
+    background-color: blue;
+}
+.scissors:hover{
+    background-color: green;
+}
 @media only screen and (min-width: 1000px) {
     #charCreation{
         width: 30%;
+    }
+    #sendMove{
+        width: 20%;
+        right:20px;
+    }
+    .typeSelector{
+        width: 90%;
     }
 }

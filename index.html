@@ -7,7 +7,7 @@
 	<style type="text/css">
 		      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 8rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
@@ -31,39 +31,40 @@
         <h2>Select your username and class!</h2>
         <label for="usernameInput">Username</label>
         <input id="usernameInput" type="text">
-        <div class="flex" style="display: flex; width: 100%; justify-content: space-between;">
-          <div class="flex selectOption flex-column">
-            <label for="rock">Rock</label>
+        <div class="flex spaceAround typeSelector" style="display: flex; width: 100%; justify-content: space-around;">
+          <div class="flex selectOption selectRock flex-column">
             <input type="radio" name="class" id="rock" value="R">
+            <label class="rock classCover" for="rock"></label>
           </div>
-          <div class="flex selectOption flex-column">
-            <label for="paper">Paper</label>
+          <div class="flex selectOption selectPaper flex-column">
             <input type="radio" name="class" id="paper" value="P">
+            <label class="paper classCover" for="paper"></label>
           </div>
-          <div class="flex selectOption flex-column">
-            <label for="scissors">Scissors</label>
+          <div class="flex selectOption selectScissors flex-column">
             <input type="radio" name="class" id="scissors" value="S">
+            <label class="scissors classCover" for="scissors"></label>
           </div>
         </div>
         <button class="btn" type="submit">Join game!</button>
       </form>
     </div>
     <ul id="messages"></ul>
-    <form id="form" action="">
-      <div class="flex" style="display: flex; width: 100%; justify-content: space-between;">
-        <div class="flex selectOption flex-column">
-          <label for="rock">Rock</label>
-          <input type="radio" name="class" id="rock" value="R">
-        </div>
-        <div class="flex selectOption flex-column">
-          <label for="paper">Paper</label>
-          <input type="radio" name="class" id="paper" value="P">
-        </div>
-        <div class="flex selectOption flex-column">
-          <label for="scissors">Scissors</label>
-          <input type="radio" name="class" id="scissors" value="S">
-        </div>
+    <form class="flex flex-column" id="form" action="">
       <button type="submit" id="sendMove">Send</button>
+      <div class="flex spaceAround typeSelector" style="display: flex; width: 50%; justify-content: space-around;">
+          <div class="flex selectOption selectRock flex-column">
+            <input type="radio" name="class" id="rock" value="R">
+            <label class="rock classCover" for="rock"></label>
+          </div>
+          <div class="flex selectOption selectPaper flex-column">
+            <input type="radio" name="class" id="paper" value="P">
+            <label class="paper classCover" for="paper"></label>
+          </div>
+          <div class="flex selectOption selectScissors flex-column">
+            <input type="radio" name="class" id="scissors" value="S">
+            <label class="scissors classCover" for="scissors"></label>
+          </div>
+      </div>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
