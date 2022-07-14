@@ -39,17 +39,17 @@ class Room{
 }
 //Determine which player won the contested throw
 function checkContestWinner(players){
-  if(players[0].move === 'R'){
-    if(players[1].move === 'S') return(0);
-    if(players[1].move === 'P') return(1);
+  if(players[0].move === 'swords'){
+    if(players[1].move === 'bows') return(0);
+    if(players[1].move === 'shields') return(1);
   }
-  if(players[0].move === 'P'){
-    if(players[1].move === 'R') return(0);
-    if(players[1].move === 'S') return(1);
+  if(players[0].move === 'shields'){
+    if(players[1].move === 'swords') return(0);
+    if(players[1].move === 'bows') return(1);
   }
-  if(players[0].move === 'S'){
-    if(players[1].move === 'P') return(0);
-    if(players[1].move === 'R') return(1);
+  if(players[0].move === 'bows'){
+    if(players[1].move === 'shields') return(0);
+    if(players[1].move === 'swords') return(1);
   }
 }
 //Return text to be printed out to players
@@ -122,12 +122,13 @@ io.on('connection', (socket) => {
       }
       else{
         text = calculateDamage(Room);
+        moves = [Room.players[0].move,Room.players[1].move];
         Room.players[0].move = undefined;
         Room.players[1].move = undefined;
-        for (var P of currentRoom.players){
-            sid = P.id
-            io.to(sid).emit('moveMade', {type: 0, text: text});
-          }
+        for (var i = 0; i<2; i++){
+          sid = Room.players[i].id;
+          io.to(sid).emit('moveMade', {type: 0, move: moves[1-i], text: text});
+        }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
           listOfPlayers = listOfPlayers.filter(player => player.username != Room.players[0].username && player.username != Room.players[1].username);
