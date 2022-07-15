@@ -51,6 +51,7 @@
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
+
     	var socket = io();
         var loginScreen = document.getElementById('login')
         var messages = document.getElementById('messages');
@@ -60,40 +61,33 @@
         var usernameInput = document.getElementById('usernameInput');
         var classInput = document.getElementById('classes');
         var selectButton = document.getElementById('sendMove');
-        socket.on('joinEvent', function(username){
+        function sendMessage(content){
           var item = document.createElement('li');
-          let content = username + " joined the game";
           item.textContent = content;
           messages.append(item);
           messages.scrollTop = messages.scrollHeight
+        }
+        socket.on('joinEvent', function(username){
+          let content = username + " joined the game";
+          sendMessage(content);
         })
         socket.on('roomJoined', function(name){
-          var item = document.createElement('li');
           let content = "You joined the " + name + " room!";
-          item.textContent = content;
-          messages.append(item);
-          item = document.createElement('li');
+          sendMessage(content);
           content = "Swords beat bows, bows beat shields, shields beat swords";
-          item.textContent = content;
-          messages.append(item);
-          messages.scrollTop = messages.scrollHeight
+          sendMessage(content);
         })
         socket.on('moveMade', values =>{
-          var item = document.createElement('li');
           let content;
           if(values.type === 1){
                 content = "You both made the same move!";
           }
           else{
-              var item2 = document.createElement('li');
               content = `Your opponet chose ${values.move}`;
-              item2.textContent = content;
-              messages.append(item2);
+              sendMessage(content);
               content = values.text
           }
-          item.textContent = content;
-          messages.append(item);
-          messages.scrollTop = messages.scrollHeight
+          sendMessage(content);
           selectButton.disabled = false;
         })
     	 usernameForm.addEventListener('submit', function(e){
@@ -112,11 +106,8 @@
           if (input) {
             socket.emit('moveSelected', input);
             selectButton.disabled = true;
-            var item = document.createElement('li');
             let content = "You chose " + input;
-            item.textContent = content;
-            messages.append(item);
-            messages.scrollTop = messages.scrollHeight
+            sendMessage(content);
           }
         });
     </script>
