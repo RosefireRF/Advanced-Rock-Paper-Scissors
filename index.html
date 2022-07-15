@@ -51,6 +51,7 @@
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
+
     	var socket = io();
         var loginScreen = document.getElementById('login')
         var messages = document.getElementById('messages');
@@ -60,8 +61,6 @@
         var usernameInput = document.getElementById('usernameInput');
         var classInput = document.getElementById('classes');
         var selectButton = document.getElementById('sendMove');
-        let players = [];
-        let myId;
         function sendMessage(content){
           var item = document.createElement('li');
           item.textContent = content;
@@ -73,8 +72,6 @@
           sendMessage(content);
         })
         socket.on('roomJoined', values=>{
-          players = values.players;
-          myId = values.myId;
           let content = "You joined the " + values.name + " room!";
           sendMessage(content);
           content = "Swords beat bows, bows beat shields, shields beat swords";
@@ -86,19 +83,9 @@
                 content = "You both made the same move!";
           }
           else{
-              content = `${players[1-myId].username} chose ${values.move}`;
+              content = `Your opponent chose ${values.move}`;
               sendMessage(content);
-              if(values.hp <= 0){
-                content = `${players[values.type].username} dealt the killing blow to ${players[1-values.type].username} winning the game`
-              }
-              if(values.type === myId){
-                console.log(players);
-                content = `You did ${values.damage} damage to ${players[1 - values.type].username}, they now have ${values.hp} health`;
-              }
-              else{
-                console.log(players);
-                content = `You took ${values.damage} damage from ${players[values.type].username}, you now have ${values.hp} health`;
-              }
+              content = values.text;
           }
           sendMessage(content);
           selectButton.disabled = false;

@@ -84,7 +84,7 @@ function roomCreation(){
   listOfRooms.push(currentRoom);
   for (var i = 0; i<2; i++){
     sid = currentRoom.players[i].id;
-    io.to(sid).emit('roomJoined', {name: currentRoom.name, players: currentRoom.players, myId: i} );
+    io.to(sid).emit('roomJoined', {name: currentRoom.name} );
   }
   console.log(listOfRooms);
 }
@@ -122,14 +122,32 @@ io.on('connection', (socket) => {
       //If players chose different moves
       else{
         var info = {winner: undefined, damage: undefined};
+        var text;
         calculateDamage(Room, info);
         console.log(`The winner is ${info.winner}`);
         moves = [Room.players[0].move,Room.players[1].move];
         Room.players[0].move = undefined;
         Room.players[1].move = undefined;
-        for (var i = 0; i<2; i++){
-          sid = Room.players[i].id;
-          io.to(sid).emit('moveMade', {type: info.winner, move: moves[1-i], damage: info.damage, hp: Room.players[1-info.winner].health});
+        //If the game has ended this round
+        if(Room.finished === 1){
+          for(var i = 0; i<2;i++){
+            sid = Room.players[i].id;
+            text = `${players[info.winner].username} dealt the killing blow to ${players[1-info.winner].username} winning the game`;
+            io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
+          }
+        }
+        //If the game has not ended this round
+        if(Room.finished === 0){
+          for (var i = 0; i<2; i++){
+            sid = Room.players[i].id;
+            if(i === info.winner){
+              text = `You did ${info.damage} damage to ${Room.players[1-info.winner].username}, they now have ${Room.players[1-info.winner].health} hp`
+            }
+            else{
+              text = `You took ${info.damage} damage from ${Room.players[info.winner].username}, you now have ${Room.players[1-info.winner].health} hp`
+            }
+            io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
+          }
         }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
