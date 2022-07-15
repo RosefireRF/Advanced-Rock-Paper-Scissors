@@ -53,24 +53,23 @@ function checkContestWinner(players){
   }
 }
 //Return text to be printed out to players
-function calculateDamage(Room){
+function calculateDamage(Room, info){
   players = Room.players;
-  damage = 10;
-  winner = checkContestWinner(players);
-  if(players[winner].pref === players[winner].move) damage *= 2;
+  info.damage = 10;
+  info.winner = checkContestWinner(players);
+  if(players[info.winner].pref === players[info.winner].move) info.damage *= 2;
   //Winner did X damage to player opposite of winner
   /*
   If player[1] is the winner, deal damage to player[1 - 1] (player[0])
   if player[0] is the winner, deal damage to player[1 - 0] (player[1])
   */
-  players[1 - winner].health -= damage;
-  if(players[1-winner].health <= 0)
+  players[1 - info.winner].health -= info.damage;
+  if(players[1-info.winner].health <= 0)
   {
     Room.finished = 1;
-    return(`${players[winner].username} dealt the killing blow to ${players[1 - winner].username}, winning the game`);
+    return;
   }
-  console.log(players);
-  return(`${players[winner].username} did ${damage} damage to ${players[1-winner].username}, they now have ${players[1-winner].health} hp`);
+  return;
 }
 function roomCreation(){
   if(listOfUsers.length < 2) return false;
@@ -83,9 +82,9 @@ function roomCreation(){
   console.log(listOfUsers);
   currentRoom = new Room(Player1, Player2)
   listOfRooms.push(currentRoom);
-  for (var P of currentRoom.players){
-    sid = P.id
-    io.to(sid).emit('roomJoined', currentRoom.name);
+  for (var i = 0; i<2; i++){
+    sid = currentRoom.players[i].id;
+    io.to(sid).emit('roomJoined', {name: currentRoom.name, players: currentRoom.players, myId: i} );
   }
   console.log(listOfRooms);
 }
@@ -117,17 +116,20 @@ io.on('connection', (socket) => {
         Room.players[1].move = undefined;
         for (var P of currentRoom.players){
             sid = P.id
-            io.to(sid).emit('moveMade', {type: 1});
+            io.to(sid).emit('moveMade', {type: 2});
           }
       }
+      //If players chose different moves
       else{
-        text = calculateDamage(Room);
+        var info = {winner: undefined, damage: undefined};
+        calculateDamage(Room, info);
+        console.log(`The winner is ${info.winner}`);
         moves = [Room.players[0].move,Room.players[1].move];
         Room.players[0].move = undefined;
         Room.players[1].move = undefined;
         for (var i = 0; i<2; i++){
           sid = Room.players[i].id;
-          io.to(sid).emit('moveMade', {type: 0, move: moves[1-i], text: text});
+          io.to(sid).emit('moveMade', {type: info.winner, move: moves[1-i], damage: info.damage, hp: Room.players[1-info.winner].health});
         }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
