@@ -26,6 +26,14 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 #charCreation input{
     width: 100%;
 }
+#charCreation > div, #charCreation > h2, #charCreation > input, #charCreation > label{
+    margin: 2% 0% 2% 0%;
+}
+.quote{
+    text-align: center;
+    font-style: italic;
+    opacity: 0.9;
+}
 .selectOption{
     width: 100% / 3;
 }
