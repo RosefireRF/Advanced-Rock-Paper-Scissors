@@ -4,34 +4,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Advanced Rock Paper Scissors</title>
-	<style type="text/css">
-		      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 25vh; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-      #username {
-        height: 25vh;
-        width: 25vw;
-        position: absolute;
-        
-      }
-
-      #messages { list-style-type: none; margin: 0; padding: 0; height: 75vh; overflow-y: scroll;}
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
-	</style>
   <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 <body>
     <div id="login" class="flex flex-column">
-      <form action="" id="charCreation" style="text-align: center;" class="flex flex-column">
+      <form action="" id="charCreation" class="flex flex-column">
         <h2>Select your username and class!</h2>
         <label for="usernameInput">Username</label>
         <input id="usernameInput" type="text">
-        <div class="flex spaceAround typeSelector" style="display: flex; width: 100%; justify-content: space-around;">
+        <div class="flex spaceAround typeSelector" id="classMenu">
           <div class="flex selectOption selectRock flex-column">
             <input type="radio" name="class" id="rock" value="swords">
             <label class="rock classCover" for="rock"></label>
@@ -49,9 +30,9 @@
       </form>
     </div>
     <ul id="messages"></ul>
-    <form class="flex flex-column" id="form" action="">
+    <form class="flex flex-column" id="moveSelectForm" action="">
       <button type="submit" id="sendMove">Send</button>
-      <div class="flex spaceAround typeSelector" style="display: flex; width: 50%; justify-content: space-around;">
+      <div class="flex spaceAround typeSelector" id="moveMenu">
           <div class="flex selectOption selectRock flex-column">
             <input type="radio" name="class" id="rock" value="swords">
             <label class="rock classCover" for="rock"></label>
@@ -71,7 +52,7 @@
     	var socket = io();
         var loginScreen = document.getElementById('login')
         var messages = document.getElementById('messages');
-        var form = document.getElementById('form');
+        var form = document.getElementById('moveSelectForm');
         var input = document.getElementById('input');
         var usernameForm = document.getElementById('charCreation');
         var usernameInput = document.getElementById('usernameInput');
@@ -130,7 +111,7 @@
             socket.emit('moveSelected', input);
             selectButton.disabled = true;
             var item = document.createElement('li');
-            let content = "You selected " + input;
+            let content = "You chose " + input;
             item.textContent = content;
             messages.append(item);
             messages.scrollTop = messages.scrollHeight
