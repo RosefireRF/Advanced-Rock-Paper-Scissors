@@ -37,6 +37,19 @@ class Room{
     this.finished = 0;
 	}
 }
+//Sanitize user input
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return string.replace(reg, (match)=>(map[match]));
+}
 //Determine which player won the contested throw
 function checkContestWinner(players){
   if(players[0].move === 'swords'){
@@ -91,7 +104,7 @@ function roomCreation(){
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('setUsername', data =>{
-      listOfUsers.push(new User(socket.id, data.name, data.class));
+      listOfUsers.push(new User(socket.id, sanitize(data.name), sanitize(data.class)));
       io.to(socket.id).emit('joinEvent', data.name)
       console.log(listOfUsers)
       roomCreation();
@@ -100,6 +113,11 @@ io.on('connection', (socket) => {
       //Find player that made move and room where it was made
       console.log("User with ID of " + socket.id + " made move " + move);
       var Player = listOfPlayers.find(element => element.id == socket.id);
+      //Check if user is not player or if user already made a move
+      if(!Player || Player.move){
+        console.log("A player tried to make an illegal move");
+        return false;
+      } 
       var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
       let movesMade = true;
       Player.move = move;

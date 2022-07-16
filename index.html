@@ -61,6 +61,7 @@
         var usernameInput = document.getElementById('usernameInput');
         var classInput = document.getElementById('classes');
         var selectButton = document.getElementById('sendMove');
+        selectButton.disabled = true;
         function sendMessage(content){
           var item = document.createElement('li');
           item.textContent = content;
@@ -76,6 +77,7 @@
           sendMessage(content);
           content = "Swords beat bows, bows beat shields, shields beat swords";
           sendMessage(content);
+          selectButton.disabled = false;  
         })
         socket.on('moveMade', values =>{
           let content;
