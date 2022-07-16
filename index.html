@@ -91,7 +91,12 @@
           }
           sendMessage(content);
           selectButton.disabled = false;
-        })
+        });
+        socket.on('opponentLeft', args=>{
+          selectButton.disabled = true;
+          content = 'Your opponent left the game, making you the winner';
+          sendMessage(content);
+        });
     	 usernameForm.addEventListener('submit', function(e){
           e.preventDefault();
           selectedClass = document.querySelector('input[name="class"]:checked').value;

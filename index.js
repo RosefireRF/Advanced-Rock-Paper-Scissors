@@ -101,6 +101,7 @@ function roomCreation(){
   }
   console.log(listOfRooms);
 }
+let possibleMoves = ['swords', 'shields', 'bows'];
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('setUsername', data =>{
@@ -108,6 +109,26 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit('joinEvent', data.name)
       console.log(listOfUsers)
       roomCreation();
+    });
+    socket.on('disconnect', reason =>{
+      //If user is not player, remove from list of users
+      var user = listOfUsers.find(element => element.id == socket.id);
+      if(user) {
+        listOfUsers = listOfUsers.filter(element => element.id = socket.id)
+        return};
+      //If user is player, remove from players, delete room and send opponent to queue
+      var Player = listOfPlayers.find(element => element.id == socket.id);
+      if(Player){
+        var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
+        leavingPlayerId = Room.players.findIndex(player => player.id === socket.id);
+        leavingPlayer = Room.players[leavingPlayerId];
+        stayingPlayer = Room.players[1-leavingPlayerId];
+        io.to(stayingPlayer.id).emit('opponentLeft');
+        listOfPlayers = listOfPlayers.filter(player => player.id != leavingPlayer.id && player.id != stayingPlayer.id);
+        listOfUsers.push(new User(stayingPlayer.id, stayingPlayer.username, stayingPlayer.pref));
+        listOfRooms = listOfRooms.filter(room => room.name != Room.name);
+        roomCreation();
+      }
     });
     socket.on('moveSelected', (move) =>{
       //Find player that made move and room where it was made
@@ -117,7 +138,10 @@ io.on('connection', (socket) => {
       if(!Player || Player.move){
         console.log("A player tried to make an illegal move");
         return false;
-      } 
+      }
+      if(!move in possibleMoves){
+        move = 'swords';
+      }
       var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
       let movesMade = true;
       Player.move = move;
