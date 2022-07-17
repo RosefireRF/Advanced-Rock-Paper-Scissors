@@ -71,7 +71,7 @@ function checkContestWinner(players){
 }
 //Return text to be printed out to players
 function calculateDamage(Room, info){
-  players = Room.players;
+  var players = Room.players;
   info.damage = 10;
   info.winner = checkContestWinner(players);
   if(players[info.winner].pref === players[info.winner].move) info.damage *= 2;
@@ -148,6 +148,7 @@ io.on('connection', (socket) => {
         move = 'swords';
       }
       var Room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
+      var players = Room.players;
       let movesMade = true;
       Player.move = move;
       console.log(listOfPlayers);
@@ -158,9 +159,9 @@ io.on('connection', (socket) => {
       }
       //If both players chose the same move
       if (movesMade == true){
-      if(Room.players[0].move === Room.players[1].move){
-        Room.players[0].move = undefined;
-        Room.players[1].move = undefined;
+      if(players[0].move === players[1].move){
+        players[0].move = undefined;
+        players[1].move = undefined;
         for (var P of currentRoom.players){
             sid = P.id
             io.to(sid).emit('moveMade', {type: 2});
@@ -172,13 +173,13 @@ io.on('connection', (socket) => {
         var text;
         calculateDamage(Room, info);
         console.log(`The winner is ${info.winner}`);
-        moves = [Room.players[0].move,Room.players[1].move];
+        moves = [players[0].move, players[1].move];
         Room.players[0].move = undefined;
         Room.players[1].move = undefined;
         //If the game has ended this round
         if(Room.finished === 1){
           for(var i = 0; i<2;i++){
-            sid = Room.players[i].id;
+            sid = players[i].id;
             text = `${players[info.winner].username} dealt the killing blow to ${players[1-info.winner].username} winning the game`;
             io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
           }
@@ -186,20 +187,20 @@ io.on('connection', (socket) => {
         //If the game has not ended this round
         if(Room.finished === 0){
           for (var i = 0; i<2; i++){
-            sid = Room.players[i].id;
+            sid = players[i].id;
             if(i === info.winner){
-              text = `You did ${info.damage} damage to ${Room.players[1-info.winner].username}, they now have ${Room.players[1-info.winner].health} hp`
+              text = `You did ${info.damage} damage to ${players[1-info.winner].username}, they now have ${players[1-info.winner].health} hp`
             }
             else{
-              text = `You took ${info.damage} damage from ${Room.players[info.winner].username}, you now have ${Room.players[1-info.winner].health} hp`
+              text = `You took ${info.damage} damage from ${players[info.winner].username}, you now have ${players[1-info.winner].health} hp`
             }
             io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
           }
         }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
-          removeFromArray(Room.players[0], listOfPlayers);
-          removeFromArray(Room.players[1], listOfPlayers);
+          removeFromArray(players[0], listOfPlayers);
+          removeFromArray(players[1], listOfPlayers);
           for (var P of Room.players){
             listOfUsers.push(new User(P.id, P.username, P.pref));
           }
