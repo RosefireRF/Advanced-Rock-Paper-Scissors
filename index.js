@@ -33,9 +33,13 @@ class Player{
 class Room{
 	constructor(Player1, Player2){
 		this.players = [Player1, Player2];
-		this.name = Player1.username + ` (${Player1.pref}) vs ` + Player2.username + ` (${Player2.pref})`;
+		this.name = `${Player1.username} (${Player1.pref}) vs ${Player2.username} (${Player2.pref})`;
     this.finished = 0;
 	}
+}
+function removeFromArray(itemToRemove, array){
+  let index = array.indexOf(itemToRemove);
+  if(index !== -1) array.splice(index, 1);
 }
 //Sanitize user input
 function sanitize(string) {
@@ -114,7 +118,7 @@ io.on('connection', (socket) => {
       //If user is not player, remove from list of users
       var user = listOfUsers.find(element => element.id == socket.id);
       if(user) {
-        listOfUsers = listOfUsers.filter(element => element.id = socket.id)
+        removeFromArray(user, listOfUsers);
         return};
       //If user is player, remove from players, delete room and send opponent to queue
       var Player = listOfPlayers.find(element => element.id == socket.id);
@@ -124,9 +128,10 @@ io.on('connection', (socket) => {
         leavingPlayer = Room.players[leavingPlayerId];
         stayingPlayer = Room.players[1-leavingPlayerId];
         io.to(stayingPlayer.id).emit('opponentLeft');
-        listOfPlayers = listOfPlayers.filter(player => player.id != leavingPlayer.id && player.id != stayingPlayer.id);
+        removeFromArray(leavingPlayer, listOfPlayers);
+        removeFromArray(stayingPlayer, listOfPlayers);
         listOfUsers.push(new User(stayingPlayer.id, stayingPlayer.username, stayingPlayer.pref));
-        listOfRooms = listOfRooms.filter(room => room.name != Room.name);
+        removeFromArray(Room, listOfRooms)
         roomCreation();
       }
     });
@@ -193,11 +198,12 @@ io.on('connection', (socket) => {
         }
         //Process the game ending, send both players to queue;
         if(Room.finished === 1){
-          listOfPlayers = listOfPlayers.filter(player => player.username != Room.players[0].username && player.username != Room.players[1].username);
+          removeFromArray(Room.players[0], listOfPlayers);
+          removeFromArray(Room.players[1], listOfPlayers);
           for (var P of Room.players){
             listOfUsers.push(new User(P.id, P.username, P.pref));
           }
-          listOfRooms = listOfRooms.filter(room => room.name != Room.name);
+          removeFromArray(Room, listOfRooms);
           roomCreation();
         }
       }
