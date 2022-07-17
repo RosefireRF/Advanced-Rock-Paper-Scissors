@@ -154,7 +154,7 @@ io.on('connection', (socket) => {
       console.log(listOfPlayers);
       console.log(Player.username + "'s move is " + Player.move);
       //If either of the players hasn't made a move, the variable is false
-      for (var P of Room.players){
+      for (var P of players){
         if(typeof P.move == 'undefined')movesMade = false;
       }
       //If both players chose the same move
@@ -174,8 +174,8 @@ io.on('connection', (socket) => {
         calculateDamage(Room, info);
         console.log(`The winner is ${info.winner}`);
         moves = [players[0].move, players[1].move];
-        Room.players[0].move = undefined;
-        Room.players[1].move = undefined;
+        players[0].move = undefined;
+        players[1].move = undefined;
         //If the game has ended this round
         if(Room.finished === 1){
           for(var i = 0; i<2;i++){
