@@ -89,7 +89,12 @@ function calculateDamage(Room, info){
   return;
 }
 function roomCreation(){
-  if(listOfUsers.length < 2) return false;
+  if(listOfUsers.length < 2){
+    if(listOfUsers.length === 1){
+      io.to(listOfUsers[0].id).emit('waitingEvent');
+    }
+    return false;
+  };
   Player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref);
   listOfPlayers.push(Player1);
   Player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref);
@@ -98,10 +103,11 @@ function roomCreation(){
   console.log("New room created!");
   console.log(listOfUsers);
   currentRoom = new Room(Player1, Player2)
+  var textValue = `<span class='${Player1.pref}-text'>${Player1.username}</span> vs <span class='${Player2.pref}-text'>${Player2.username}</span> `
   listOfRooms.push(currentRoom);
   for (var i = 0; i<2; i++){
     sid = currentRoom.players[i].id;
-    io.to(sid).emit('roomJoined', {name: currentRoom.name} );
+    io.to(sid).emit('roomJoined', {name: textValue} );
   }
   console.log(listOfRooms);
 }
@@ -109,8 +115,10 @@ let possibleMoves = ['swords', 'shields', 'bows'];
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('setUsername', data =>{
-      listOfUsers.push(new User(socket.id, sanitize(data.name), sanitize(data.class)));
-      io.to(socket.id).emit('joinEvent', data.name)
+      let name = sanitize(data.name);
+      let pref = sanitize(data.pref);
+      listOfUsers.push(new User(socket.id, name, pref));
+      io.to(socket.id).emit('joinEvent', {name: name, pref:pref})
       console.log(listOfUsers)
       roomCreation();
     });
@@ -180,7 +188,7 @@ io.on('connection', (socket) => {
         if(Room.finished === 1){
           for(var i = 0; i<2;i++){
             sid = players[i].id;
-            text = `${players[info.winner].username} dealt the killing blow to ${players[1-info.winner].username} winning the game`;
+            text = `<span class='${moves[info.winner]}-text'>${players[info.winner].username}</span> dealt the killing blow to <span class='${moves[1-info.winner]}-text'>${players[info.winner].username}</span> winning the game`;
             io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
           }
         }
@@ -189,10 +197,10 @@ io.on('connection', (socket) => {
           for (var i = 0; i<2; i++){
             sid = players[i].id;
             if(i === info.winner){
-              text = `You did ${info.damage} damage to ${players[1-info.winner].username}, they now have ${players[1-info.winner].health} hp`
+              text = `<span class='${moves[info.winner]}-text'>You</span> did ${info.damage} damage to <span class='${moves[1-info.winner]}-text'>${players[1-info.winner].username}</span> they now have ${players[1-info.winner].health} hp`
             }
             else{
-              text = `You took ${info.damage} damage from ${players[info.winner].username}, you now have ${players[1-info.winner].health} hp`
+              text = `<span class='${moves[1-info.winner]}-text'>You</span> took ${info.damage} damage from <span class='${moves[info.winner]}-text'>${players[info.winner].username}</span>, you now have ${players[1-info.winner].health} hp`
             }
             io.to(sid).emit('moveMade', {type: info.winner, move:moves[1-i], text:text});
           }

@@ -64,18 +64,22 @@
         selectButton.disabled = true;
         function sendMessage(content){
           var item = document.createElement('li');
-          item.textContent = content;
+          item.innerHTML = content;
           messages.append(item);
           messages.scrollTop = messages.scrollHeight
         }
-        socket.on('joinEvent', function(username){
-          let content = username + " joined the game";
+        socket.on('joinEvent', values=>{
+          let content = `<span class='${values.pref}-text'>${values.name}</span> joined the game`;
+          sendMessage(content);
+        });
+        socket.on('waitingEvent', values =>{
+          content = 'Waiting for another player'
           sendMessage(content);
         })
         socket.on('roomJoined', values=>{
           let content = "You joined the " + values.name + " room!";
           sendMessage(content);
-          content = "Swords beat bows, bows beat shields, shields beat swords";
+          content = `<span class='swords-text'>Swords</span> beat <span class='bows-text'>bows</span>, <span class='bows-text'>bows</span> beat <span class='shields-text'>shields</span>, <span class='shields-text'>shields</span> beat <span class='swords-text'>Swords</span>`;
           sendMessage(content);
           selectButton.disabled = false;  
         })
@@ -85,7 +89,7 @@
                 content = "You both made the same move!";
           }
           else{
-              content = `Your opponent chose ${values.move}`;
+              content = `Your opponent chose <span class='${values.move}-text'>${values.move}</span>`;
               sendMessage(content);
               content = values.text;
           }
@@ -101,7 +105,7 @@
           e.preventDefault();
           selectedClass = document.querySelector('input[name="class"]:checked').value;
           if(usernameInput.value && selectedClass){
-            socket.emit('setUsername', {name: usernameInput.value, class : selectedClass});
+            socket.emit('setUsername', {name: usernameInput.value, pref : selectedClass});
             console.log(usernameInput.value + "ime");
             loginScreen.remove();
             usernameInput.value = '';
@@ -109,11 +113,11 @@
         })
     	 form.addEventListener('submit', function(e) {
           e.preventDefault();
-          input = document.querySelector('input[name="class"]:checked').value;
+          var input = document.querySelector('input[name="class"]:checked').value;
           if (input) {
             socket.emit('moveSelected', input);
             selectButton.disabled = true;
-            let content = "You chose " + input;
+            let content = `You chose <span class='${input}-text'>${input}</span>`;
             sendMessage(content);
           }
         });

@@ -1,3 +1,6 @@
+:root{
+    --green: #33cc33;
+}
 *{
     padding: 0%;
     margin: 0%;
@@ -67,6 +70,15 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 .spaceAround{
     justify-content: space-around;
 }
+.swords-text{
+    color: red;
+}
+.shields-text{
+    color:  blue;
+}
+.bows-text{
+    color: var(--green);
+}
 .rock{
     background-image:url("../images/sword.png");
 }
@@ -84,7 +96,7 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
     background-color: blue;
 }
 .selectScissors input:checked ~.scissors{
-    background-color: green;
+    background-color: var(--green);
 }
 .rock:hover{
     background-color: red;
@@ -93,7 +105,7 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
     background-color: blue;
 }
 .scissors:hover{
-    background-color: green;
+    background-color: var(--green);
 }
 /*Player messages*/
 #messages { list-style-type: none; margin: 0; padding: 0; height: 75vh; overflow-y: scroll;}
