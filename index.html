@@ -7,23 +7,23 @@
   <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 <body>
-    <div id="login" class="flex flex-column">
-      <form action="" id="charCreation" class="flex flex-column">
+    <div id="login" class="flex flexColumn">
+      <form action="" id="charCreation" class="flex flexColumn">
         <h2>Select your username</h2>
         <label class="quote" for="usernameInput">Username</label>
         <input id="usernameInput" type="text">
         <h2>Class select</h2>
         <p class="quote">Swords beat bows, bows beat shields, shields beat swords</p>
         <div class="flex spaceAround typeSelector" id="classMenu">
-          <div class="flex selectOption selectRock flex-column">
+          <div class="flex selectOption selectRock flexColumn">
             <input type="radio" name="class" id="rock" value="swords">
             <label class="rock classCover" for="rock"></label>
           </div>
-          <div class="flex selectOption selectPaper flex-column">
+          <div class="flex selectOption selectPaper flexColumn">
             <input type="radio" name="class" id="paper" value="shields">
             <label class="paper classCover" for="paper"></label>
           </div>
-          <div class="flex selectOption selectScissors flex-column">
+          <div class="flex selectOption selectScissors flexColumn">
             <input type="radio" name="class" id="scissors" value="bows">
             <label class="scissors classCover" for="scissors"></label>
           </div>
@@ -32,18 +32,18 @@
       </form>
     </div>
     <ul id="messages"></ul>
-    <form class="flex flex-column" id="moveSelectForm" action="">
+    <form class="flex flexColumn" id="moveSelectForm" action="">
       <button type="submit" id="sendMove">Send</button>
       <div class="flex spaceAround typeSelector" id="moveMenu">
-          <div class="flex selectOption selectRock flex-column">
+          <div class="flex selectOption selectRock flexColumn">
             <input type="radio" name="class" id="rock" value="swords">
             <label class="rock classCover" for="rock"></label>
           </div>
-          <div class="flex selectOption selectPaper flex-column">
+          <div class="flex selectOption selectPaper flexColumn">
             <input type="radio" name="class" id="paper" value="shields">
             <label class="paper classCover" for="paper"></label>
           </div>
-          <div class="flex selectOption selectScissors flex-column">
+          <div class="flex selectOption selectScissors flexColumn">
             <input type="radio" name="class" id="scissors" value="bows">
             <label class="scissors classCover" for="scissors"></label>
           </div>
@@ -96,7 +96,7 @@
           sendMessage(content);
           selectButton.disabled = false;
         });
-        socket.on('opponentLeft', args=>{
+        socket.on('opponentLeft', values=>{
           selectButton.disabled = true;
           content = 'Your opponent left the game, making you the winner';
           sendMessage(content);
@@ -111,7 +111,7 @@
             usernameInput.value = '';
           }
         })
-    	 form.addEventListener('submit', function(e) {
+    	 form.addEventListener('submit', function(e){
           e.preventDefault();
           var input = document.querySelector('input[name="class"]:checked').value;
           if (input) {
