@@ -11,19 +11,25 @@ app.get('/', (req, res) => {
 
 app.use(express.static(__dirname + '/public'));
 var sRoomId = 0;
+var sPlayerId = 0;
+var sUserId = 0;
 listOfUsers = [];
 listOfPlayers = [];
 listOfRooms = [];
+mapOfUsers = new Map();
+mapOfPlayers = new Map();
 class User {
-  constructor(id, username, pref){
+  constructor(id, username, pref, sid){
     this.id = id;
+    this.sid = sid;
     this.username = username;
     this.pref = pref;
   }
 }
 class Player{
-	constructor(id, username, pref, roomId){
+	constructor(id, username, pref, roomId, sid){
 		this.id = id;
+    this.sid = sid;
     this.roomId = roomId;
 		this.username = username
 		this.health = 100;
@@ -40,17 +46,18 @@ class Room{
 	}
 }
 function removeFromArray(itemToRemove, array){
-  let index = array.indexOf(itemToRemove);
+  let index = binarySearch(array, itemToRemove.sid);
   if(index !== -1) array.splice(index, 1);
 }
 //Sanitize user input
 function binarySearch(array, id){
   let left = 0;
   let right = array.length - 1;
+  if(right < 0) return -1;
   let middle;
   while(left<right){
-    middle = (left + right) / 2;
-    if(id > array[middle]) left = middle+1;
+    middle = Math.floor((left + right) / 2);
+    if(id > array[middle].sid) left = middle+1;
     else right = middle;
   }
   if(array[left].sid === id) return left;
@@ -84,8 +91,8 @@ function checkContestWinner(players){
   }
 }
 //Return text to be printed out to players
-function calculateDamage(Room, info){
-  let players = Room.players;
+function calculateDamage(room, info){
+  let players = room.players;
   info.damage = 10;
   info.winner = checkContestWinner(players);
   if(players[info.winner].pref === players[info.winner].move) info.damage *= 2;
@@ -97,7 +104,7 @@ function calculateDamage(Room, info){
   players[1 - info.winner].health -= info.damage;
   if(players[1-info.winner].health <= 0)
   {
-    Room.finished = 1;
+    room.finished = 1;
     return;
   }
   return;
@@ -109,10 +116,14 @@ function roomCreation(){
     }
     return false;
   };
-  let player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref, sRoomId);
+  let player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref, sRoomId, sPlayerId);
   listOfPlayers.push(player1);
-  let player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref, sRoomId);
+  mapOfPlayers.set(listOfUsers[0].id, sPlayerId);
+  sPlayerId++;
+  let player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref, sRoomId, sPlayerId);
   listOfPlayers.push(player2);
+  mapOfPlayers.set(listOfUsers[1].id, sPlayerId);
+  sPlayerId++;
   listOfUsers.splice(0, 2);
   console.log("New room created!");
   console.log(listOfUsers);
@@ -132,28 +143,35 @@ io.on('connection', (socket) => {
     socket.on('setUsername', data =>{
       let name = sanitize(data.name);
       let pref = sanitize(data.pref);
-      listOfUsers.push(new User(socket.id, name, pref));
+      listOfUsers.push(new User(socket.id, name, pref, sUserId));
+      mapOfUsers.set(socket.id, sUserId);
+      sUserId++;
       io.to(socket.id).emit('joinEvent', {name: name, pref:pref})
       console.log(listOfUsers)
       roomCreation();
     });
     socket.on('disconnect', reason =>{
       //If user is not player, remove from list of users
-      let user = listOfUsers.find(element => element.id == socket.id);
+      let user = listOfUsers[binarySearch(listOfUsers, mapOfUsers.get(socket.id))];
       if(user) {
         removeFromArray(user, listOfUsers);
+        mapOfUsers.delete(socket.id);
         return};
       //If user is player, remove from players, delete room and send opponent to queue
-      let player = listOfPlayers.find(element => element.id == socket.id);
-      if(Player){
+      let player = listOfPlayers[binarySearch(listOfPlayers, mapOfPlayers.get(socket.id))];
+      if(player){
         let room = listOfRooms[binarySearch(listOfRooms, player.roomId)];
         leavingPlayerId = room.players.findIndex(player => player.id === socket.id);
         leavingPlayer = room.players[leavingPlayerId];
         stayingPlayer = room.players[1-leavingPlayerId];
         io.to(stayingPlayer.id).emit('opponentLeft');
         removeFromArray(leavingPlayer, listOfPlayers);
+        mapOfPlayers.delete(leavingPlayer.id);
         removeFromArray(stayingPlayer, listOfPlayers);
-        listOfUsers.push(new User(stayingPlayer.id, stayingPlayer.username, stayingPlayer.pref));
+        mapOfPlayers.delete(stayingPlayer.id);
+        listOfUsers.push(new User(stayingPlayer.id, stayingPlayer.username, stayingPlayer.pref, sUserId));
+        mapOfUsers.set(stayingPlayer.id, sUserId);
+        sUserId++;
         removeFromArray(room, listOfRooms)
         roomCreation();
       }
@@ -161,7 +179,7 @@ io.on('connection', (socket) => {
     socket.on('moveSelected', (move) =>{
       //Find player that made move and room where it was made
       console.log("User with ID of " + socket.id + " made move " + move);
-      let player = listOfPlayers.find(element => element.id == socket.id);
+      let player = listOfPlayers[binarySearch(listOfPlayers, mapOfPlayers.get(socket.id))];
       //Check if user is not player or if user already made a move
       if(!player || player.move){
         console.log("A player tried to make an illegal move");
@@ -171,7 +189,6 @@ io.on('connection', (socket) => {
         move = 'swords';
       }
       let room = listOfRooms[binarySearch(listOfRooms, player.roomId)];
-      console.log(binarySearch(listOfRooms, player.roomId));
       console.log(room);
       let players = room.players;
       let movesMade = true;
@@ -227,7 +244,10 @@ io.on('connection', (socket) => {
           removeFromArray(players[0], listOfPlayers);
           removeFromArray(players[1], listOfPlayers);
           for (let P of players){
-            listOfUsers.push(new User(P.id, P.username, P.pref));
+            listOfUsers.push(new User(P.id, P.username, P.pref, sUserId));
+            mapOfUsers.set(P.id, sUserId);
+            sUserId++;
+            mapOfPlayers.delete(P.id);
             roomCreation();
           }
           removeFromArray(room, listOfRooms);
