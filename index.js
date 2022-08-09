@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(express.static(__dirname + '/public'));
-
+var sRoomId = 0;
 listOfUsers = [];
 listOfPlayers = [];
 listOfRooms = [];
@@ -22,8 +22,9 @@ class User {
   }
 }
 class Player{
-	constructor(id, username, pref){
+	constructor(id, username, pref, roomId){
 		this.id = id;
+    this.roomId = roomId;
 		this.username = username
 		this.health = 100;
     this.move;
@@ -31,7 +32,8 @@ class Player{
 	}
 }
 class Room{
-	constructor(Player1, Player2){
+	constructor(Player1, Player2, sid){
+    this.sid = sid;
 		this.players = [Player1, Player2];
 		this.name = `${Player1.username} (${Player1.pref}) vs ${Player2.username} (${Player2.pref})`;
     this.finished = 0;
@@ -42,6 +44,18 @@ function removeFromArray(itemToRemove, array){
   if(index !== -1) array.splice(index, 1);
 }
 //Sanitize user input
+function binarySearch(array, id){
+  let left = 0;
+  let right = array.length - 1;
+  let middle;
+  while(left<right){
+    middle = (left + right) / 2;
+    if(id > array[middle]) left = middle+1;
+    else right = middle;
+  }
+  if(array[left].sid === id) return left;
+  else return -1;
+}
 function sanitize(string) {
   const map = {
       '&': '&amp;',
@@ -95,16 +109,17 @@ function roomCreation(){
     }
     return false;
   };
-  let player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref);
+  let player1 = new Player(listOfUsers[0].id, listOfUsers[0].username, listOfUsers[0].pref, sRoomId);
   listOfPlayers.push(player1);
-  let player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref);
+  let player2 = new Player(listOfUsers[1].id, listOfUsers[1].username, listOfUsers[1].pref, sRoomId);
   listOfPlayers.push(player2);
   listOfUsers.splice(0, 2);
   console.log("New room created!");
   console.log(listOfUsers);
-  let currentRoom = new Room(player1, player2)
-  let textValue = `<span class='${player1.pref}-text'>${player1.username}</span> vs <span class='${player2.pref}-text'>${player2.username}</span> `
+  let currentRoom = new Room(player1, player2, sRoomId);
   listOfRooms.push(currentRoom);
+  sRoomId++;
+  let textValue = `<span class='${player1.pref}-text'>${player1.username}</span> vs <span class='${player2.pref}-text'>${player2.username}</span> `;
   for (let i = 0; i<2; i++){
     sid = currentRoom.players[i].id;
     io.to(sid).emit('roomJoined', {name: textValue} );
@@ -129,9 +144,9 @@ io.on('connection', (socket) => {
         removeFromArray(user, listOfUsers);
         return};
       //If user is player, remove from players, delete room and send opponent to queue
-      let Player = listOfPlayers.find(element => element.id == socket.id);
+      let player = listOfPlayers.find(element => element.id == socket.id);
       if(Player){
-        let room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
+        let room = listOfRooms[binarySearch(listOfRooms, player.roomId)];
         leavingPlayerId = room.players.findIndex(player => player.id === socket.id);
         leavingPlayer = room.players[leavingPlayerId];
         stayingPlayer = room.players[1-leavingPlayerId];
@@ -155,7 +170,9 @@ io.on('connection', (socket) => {
       if(!move in possibleMoves){
         move = 'swords';
       }
-      let room = listOfRooms.find(element => element.players.find(elem => elem.id == socket.id));
+      let room = listOfRooms[binarySearch(listOfRooms, player.roomId)];
+      console.log(binarySearch(listOfRooms, player.roomId));
+      console.log(room);
       let players = room.players;
       let movesMade = true;
       player.move = move;
