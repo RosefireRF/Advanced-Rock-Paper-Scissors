@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Advanced Rock Paper Scissors</title>
-  <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="author" content="Ilija Krstić"/>
+    <meta name="description" content="Multiplayer rock paper scissors with classes!"/>
+    <meta name="keywords" content="rock paper scissors, swords, shields, bows, game, class"/>
+    <title>Advanced Rock Paper Scissors</title>
+    <link rel="stylesheet" href="/css/style.css" type="text/css"/>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 </head>
 <body>
     <div id="login" class="flex flexColumn">
       <form action="" id="charCreation" class="flex flexColumn">
-        <h2>Select your username</h2>
-        <label class="quote" for="usernameInput">Username</label>
-        <input id="usernameInput" type="text">
+        <h2><label for="usernameInput">Select your username</label></h2>
+        <input required="required" placeholder="Jeremy" id="usernameInput" type="text"/>
         <h2>Class select</h2>
         <p class="quote">Swords beat bows, bows beat shields, shields beat swords</p>
         <div class="flex spaceAround typeSelector" id="classMenu">
@@ -51,8 +54,7 @@
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
-
-    	var socket = io();
+    	  var socket = io();
         var loginScreen = document.getElementById('login')
         var messages = document.getElementById('messages');
         var form = document.getElementById('moveSelectForm');
@@ -63,7 +65,7 @@
         var selectButton = document.getElementById('sendMove');
         selectButton.disabled = true;
         function sendMessage(content){
-          var item = document.createElement('li');
+          let item = document.createElement('li');
           item.innerHTML = content;
           messages.append(item);
           messages.scrollTop = messages.scrollHeight
@@ -113,7 +115,7 @@
         })
     	 form.addEventListener('submit', function(e){
           e.preventDefault();
-          var input = document.querySelector('input[name="class"]:checked').value;
+          let input = document.querySelector('input[name="class"]:checked').value;
           if (input) {
             socket.emit('moveSelected', input);
             selectButton.disabled = true;

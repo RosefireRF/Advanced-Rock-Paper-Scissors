@@ -16,7 +16,7 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 }
 /*Character creation*/
 #login{
-    background-color: yellow;
+    background-color: grey;
     position: absolute;
     z-index: 5;
     width: 100vw;
@@ -39,6 +39,7 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 }
 #usernameInput{
     text-align: center;
+    padding: 5px;
 }
 .selectOption{
     width: 100% / 3;
@@ -93,7 +94,6 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 }
 .selectRock input:checked ~.rock{
     background-color: red;
-    border: 1px solid red;
 }
 .selectPaper input:checked ~.paper{
     background-color: blue;
